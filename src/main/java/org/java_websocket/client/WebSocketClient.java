@@ -44,7 +44,7 @@ import org.java_websocket.handshake.ServerHandshake;
  * 
  * @author Nathan Rajlich
  */
-public abstract class WebSocketClient extends WebSocketAdapter implements Runnable {
+public abstract class WebSocketClient extends WebSocketAdapter implements Runnable, IWebSocketClient {
 
 	/**
 	 * The URI this channel is supposed to connect to.
@@ -125,11 +125,13 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * 
 	 * @return The <tt>URI</tt> for this WebSocketClient.
 	 */
+	@Override
 	public URI getURI() {
 		return uri;
 	}
 
 	/** Returns the protocol version this channel uses. */
+	@Override
 	public Draft getDraft() {
 		return draft;
 	}
@@ -139,6 +141,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * connection to the URI specified in the constructor or via <var>setURI</var>.
 	 * <var>setURI</var>.
 	 */
+	@Override
 	public void connect() {
 		if( thread != null )
 			throw new IllegalStateException( "WebSocketClient objects are not reuseable" );
@@ -150,18 +153,21 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * Same as connect but blocks until the websocket connected or failed to do so.<br>
 	 * Returns whether it succeeded or not.
 	 **/
+	@Override
 	public boolean connectBlocking() throws InterruptedException {
 		connect();
 		connectLatch.await();
 		return conn.isOpen();
 	}
 
+	@Override
 	public void close() {
 		if( thread != null && conn != null ) {
 			conn.close( CloseFrame.NORMAL );
 		}
 	}
 
+	@Override
 	public void closeBlocking() throws InterruptedException {
 		close();
 		closeLatch.await();
@@ -173,6 +179,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * @param text
 	 *            The String to send to the WebSocket server.
 	 */
+	@Override
 	public void send( String text ) throws NotYetConnectedException {
 		if( conn != null ) {
 			conn.send( text );
@@ -185,6 +192,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * @param data
 	 *            The Byte-Array of data to send to the WebSocket server.
 	 */
+	@Override
 	public void send( byte[] data ) throws NotYetConnectedException {
 		if( conn != null ) {
 			conn.send( data );
@@ -342,6 +350,7 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 	 * This represents the state of the connection.
 	 * You can use this method instead of
 	 */
+	@Override
 	public READYSTATE getReadyState() {
 		if( conn == null ) {
 			return READYSTATE.NOT_YET_CONNECTED;
@@ -418,29 +427,39 @@ public abstract class WebSocketClient extends WebSocketAdapter implements Runnab
 		onClosing( code, reason, remote );
 	}
 
+	@Override
 	public void onCloseInitiated( int code, String reason ) {
 	}
 
+	@Override
 	public void onClosing( int code, String reason, boolean remote ) {
 	}
 
+	@Override
 	public IWebSocket getConnection() {
 		return conn;
 	}
 
+	@Override
 	public final void setWebSocketFactory( WebSocketClientFactory wsf ) {
 		this.wf = wsf;
 	}
 
+	@Override
 	public final WebSocketFactory getWebSocketFactory() {
 		return wf;
 	}
 
 	// ABTRACT METHODS /////////////////////////////////////////////////////////
+	@Override
 	public abstract void onOpen( ServerHandshake handshakedata );
+	@Override
 	public abstract void onMessage( String message );
+	@Override
 	public abstract void onClose( int code, String reason, boolean remote );
+	@Override
 	public abstract void onError( Exception ex );
+	@Override
 	public void onMessage( ByteBuffer bytes ) {
 	};
 

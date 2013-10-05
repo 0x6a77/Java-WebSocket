@@ -14,6 +14,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
 import org.java_websocket.WebSocket;
+import org.java_websocket.client.IWebSocketClient;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.drafts.Draft;
 import org.java_websocket.drafts.Draft_10;
@@ -31,7 +32,7 @@ public class ChatClient extends JFrame implements ActionListener {
 	private final JTextArea ta;
 	private final JTextField chatField;
 	private final JComboBox draft;
-	private WebSocketClient cc;
+	private IWebSocketClient cc;
 
 	public ChatClient( String defaultlocation ) {
 		super( "WebSocket Chat Client" );
