@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/ck1125/Java-WebSocket.png?branch=master)](https://travis-ci.org/ck1125/Java-WebSocket)
 Java WebSockets
 ===============
 
@@ -32,8 +33,14 @@ The ant targets are: ```compile```, ```jar```, ```doc``` and ```clean```
 
 ###Maven
 
-Maven is supported. More documentation in that is yet to come...
-
+To use maven just add this dependency to your pom.xml:
+```xml
+<dependency>
+    <groupId>org.java-websocket</groupId>
+    <artifactId>Java-WebSocket</artifactId>
+    <version>1.3.0</version>
+</dependency> 
+```
 
 Running the Examples
 -------------------
@@ -90,7 +97,7 @@ To see how to use wss please take a look at the examples.<br>
 If you do not have a valid **certificate** in place then you will have to create a self signed one.
 Browsers will simply refuse the connection in case of a bad certificate and will not ask the user to accept it.
 So the first step will be to make a browser to accept your self signed certificate. ( https://bugzilla.mozilla.org/show_bug.cgi?id=594502 ).<br>
-If the websocket server url is `wss://localhost:8000` visit the url `htts://localhost:8000` with your browser. The browser will recognize the handshake and allow you to accept the certificate.
+If the websocket server url is `wss://localhost:8000` visit the url `https://localhost:8000` with your browser. The browser will recognize the handshake and allow you to accept the certificate. This technique is also demonstrated in this [video](http://www.youtube.com/watch?v=F8lBdfAZPkU).
 
 The vm option `-Djavax.net.debug=all` can help to find out if there is a problem with the certificate.
 

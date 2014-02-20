@@ -21,7 +21,6 @@ import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import org.java_websocket.client.IWebSocketClient;
 import org.java_websocket.client.WebSocketClient;
 
 public class ServerStressTest extends JFrame {
@@ -198,7 +197,7 @@ public class ServerStressTest extends JFrame {
 		String payload = text.getText();
 		long time1 = System.currentTimeMillis();
 		synchronized ( websockets ) {
-			for( IWebSocketClient cl : websockets ) {
+			for( WebSocketClient cl : websockets ) {
 				try {
 					cl.send( payload );
 				} catch ( NotYetConnectedException e ) {

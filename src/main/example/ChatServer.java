@@ -5,8 +5,9 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.Collection;
 
-import org.java_websocket.IWebSocket;
 import org.java_websocket.WebSocket;
+import org.java_websocket.WebSocketImpl;
+import org.java_websocket.framing.Framedata;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -24,25 +25,30 @@ public class ChatServer extends WebSocketServer {
 	}
 
 	@Override
-	public void onOpen( IWebSocket conn, ClientHandshake handshake ) {
+	public void onOpen( WebSocket conn, ClientHandshake handshake ) {
 		this.sendToAll( "new connection: " + handshake.getResourceDescriptor() );
 		System.out.println( conn.getRemoteSocketAddress().getAddress().getHostAddress() + " entered the room!" );
 	}
 
 	@Override
-	public void onClose( IWebSocket conn, int code, String reason, boolean remote ) {
+	public void onClose( WebSocket conn, int code, String reason, boolean remote ) {
 		this.sendToAll( conn + " has left the room!" );
 		System.out.println( conn + " has left the room!" );
 	}
 
 	@Override
-	public void onMessage( IWebSocket conn, String message ) {
+	public void onMessage( WebSocket conn, String message ) {
 		this.sendToAll( message );
 		System.out.println( conn + ": " + message );
 	}
 
+	@Override
+	public void onFragment( WebSocket conn, Framedata fragment ) {
+		System.out.println( "received fragment: " + fragment );
+	}
+
 	public static void main( String[] args ) throws InterruptedException , IOException {
-		WebSocket.DEBUG = true;
+		WebSocketImpl.DEBUG = true;
 		int port = 8887; // 843 flash policy port
 		try {
 			port = Integer.parseInt( args[ 0 ] );
@@ -56,11 +62,18 @@ public class ChatServer extends WebSocketServer {
 		while ( true ) {
 			String in = sysin.readLine();
 			s.sendToAll( in );
+			if( in.equals( "exit" ) ) {
+				s.stop();
+				break;
+			} else if( in.equals( "restart" ) ) {
+				s.stop();
+				s.start();
+				break;
+			}
 		}
 	}
-
 	@Override
-	public void onError( IWebSocket conn, Exception ex ) {
+	public void onError( WebSocket conn, Exception ex ) {
 		ex.printStackTrace();
 		if( conn != null ) {
 			// some errors like port binding failed may not be assignable to a specific websocket
@@ -76,9 +89,9 @@ public class ChatServer extends WebSocketServer {
 	 *             When socket related I/O errors occur.
 	 */
 	public void sendToAll( String text ) {
-		Collection<IWebSocket> con = connections();
+		Collection<WebSocket> con = connections();
 		synchronized ( con ) {
-			for( IWebSocket c : con ) {
+			for( WebSocket c : con ) {
 				c.send( text );
 			}
 		}

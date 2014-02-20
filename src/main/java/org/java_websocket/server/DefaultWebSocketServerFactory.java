@@ -13,14 +13,14 @@ import org.java_websocket.server.WebSocketServer.WebSocketServerFactory;
 public class DefaultWebSocketServerFactory implements WebSocketServerFactory {
 	@Override
 	public WebSocketImpl createWebSocket( WebSocketAdapter a, Draft d, Socket s ) {
-		return new WebSocketImpl( a, d, s );
+		return new WebSocketImpl( a, d );
 	}
 	@Override
 	public WebSocketImpl createWebSocket( WebSocketAdapter a, List<Draft> d, Socket s ) {
-		return new WebSocketImpl( a, d, s );
+		return new WebSocketImpl( a, d );
 	}
 	@Override
-	public SocketChannel wrapChannel( SelectionKey c ) {
-		return (SocketChannel) c.channel();
+	public SocketChannel wrapChannel( SocketChannel channel, SelectionKey key ) {
+		return (SocketChannel) channel;
 	}
 }
