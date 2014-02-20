@@ -3,6 +3,9 @@ package org.java_websocket;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
+import java.nio.channels.spi.AbstractSelectableChannel;
+
+import org.java_websocket.WebSocket.Role;
 
 public class SocketChannelIOHelper {
 
@@ -18,6 +21,10 @@ public class SocketChannelIOHelper {
 		return read != 0;
 	}
 
+	/**
+	 * @see WrappedByteChannel#readMore(ByteBuffer)
+	 * @return returns whether there is more data left which can be obtained via {@link #readMore(ByteBuffer, WebSocketImpl, WrappedByteChannel)}
+	 **/
 	public static boolean readMore( final ByteBuffer buf, WebSocketImpl ws, WrappedByteChannel channel ) throws IOException {
 		buf.clear();
 		int read = channel.readMore( buf );
@@ -35,10 +42,11 @@ public class SocketChannelIOHelper {
 	/** Returns whether the whole outQueue has been flushed */
 	public static boolean batch( WebSocketImpl ws, ByteChannel sockchannel ) throws IOException {
 		ByteBuffer buffer = ws.outQueue.peek();
+		WrappedByteChannel c = null;
 
 		if( buffer == null ) {
 			if( sockchannel instanceof WrappedByteChannel ) {
-				WrappedByteChannel c = (WrappedByteChannel) sockchannel;
+				c = (WrappedByteChannel) sockchannel;
 				if( c.isNeedWrite() ) {
 					c.writeMore();
 				}
@@ -55,12 +63,11 @@ public class SocketChannelIOHelper {
 			} while ( buffer != null );
 		}
 
-		if( ws.outQueue.isEmpty() && ws.isFlushAndClose() ) {
+		if( ws.outQueue.isEmpty() && ws.isFlushAndClose() && ws.getDraft().getRole() == WebSocket.Role.SERVER ) {//
 			synchronized ( ws ) {
 				ws.closeConnection();
 			}
 		}
-		return sockchannel instanceof WrappedByteChannel == true ? !( (WrappedByteChannel) sockchannel ).isNeedWrite() : true;
+		return c != null ? !( (WrappedByteChannel) sockchannel ).isNeedWrite() : true;
 	}
-
 }

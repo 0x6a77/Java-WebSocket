@@ -7,10 +7,10 @@ import java.security.KeyStore;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.java_websocket.WebSocket;
-import org.java_websocket.client.DefaultSSLWebSocketClientFactory;
+import org.java_websocket.WebSocketImpl;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -55,7 +55,7 @@ public class SSLClientExample {
 	 *keytool -genkey -validity 3650 -keystore "keystore.jks" -storepass "storepassword" -keypass "keypassword" -alias "default" -dname "CN=127.0.0.1, OU=MyOrgUnit, O=MyOrg, L=MyCity, S=MyRegion, C=MyCountry"
 	 */
 	public static void main( String[] args ) throws Exception {
-		WebSocket.DEBUG = true;
+		WebSocketImpl.DEBUG = true;
 
 		WebSocketChatClient chatclient = new WebSocketChatClient( new URI( "wss://localhost:8887" ) );
 
@@ -79,7 +79,9 @@ public class SSLClientExample {
 		sslContext.init( kmf.getKeyManagers(), tmf.getTrustManagers(), null );
 		// sslContext.init( null, null, null ); // will use java's default key and trust store which is sufficient unless you deal with self-signed certificates
 
-		chatclient.setWebSocketFactory( new DefaultSSLWebSocketClientFactory( sslContext ) );
+		SSLSocketFactory factory = sslContext.getSocketFactory();// (SSLSocketFactory) SSLSocketFactory.getDefault();
+
+		chatclient.setSocket( factory.createSocket() );
 
 		chatclient.connectBlocking();
 
