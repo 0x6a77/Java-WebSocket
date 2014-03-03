@@ -394,6 +394,8 @@ public class WebSocketImpl implements WebSocket {
 	}
 
 	private void close( int code, String message, boolean remote ) {
+		if( DEBUG )
+			System.out.println( "close: code: " + code + " message: " + message);
 		if( readystate != READYSTATE.CLOSING && readystate != READYSTATE.CLOSED ) {
 			if( readystate == READYSTATE.OPEN ) {
 				if( code == CloseFrame.ABNORMAL_CLOSE ) {
@@ -434,6 +436,8 @@ public class WebSocketImpl implements WebSocket {
 
 	@Override
 	public void close( int code, String message ) {
+		if( DEBUG )
+			System.out.println( "close: code: " + code + " message: " + message);
 		close( code, message, false );
 	}
 
@@ -447,6 +451,8 @@ public class WebSocketImpl implements WebSocket {
 	 **/
 
 	protected synchronized void closeConnection( int code, String message, boolean remote ) {
+		if( DEBUG )
+			System.out.println( "close connection: code: " + code + " message: " + message + " remote: " + remote);
 		if( readystate == READYSTATE.CLOSED ) {
 			return;
 		}
@@ -726,6 +732,8 @@ public class WebSocketImpl implements WebSocket {
 
 	@Override
 	public void close() {
+		if( DEBUG )
+			System.out.println( "close: CloseFrame.NORMAL" );
 		close( CloseFrame.NORMAL );
 	}
 

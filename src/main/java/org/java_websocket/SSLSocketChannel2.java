@@ -173,7 +173,12 @@ public class SSLSocketChannel2 implements ByteChannel, WrappedByteChannel {
 	protected void consumeDelegatedTasks() {
 		Runnable task;
 		while ( ( task = sslEngine.getDelegatedTask() ) != null ) {
-			tasks.add( exec.submit( task ) );
+			// JBW - 19FEB14: Sometimes we get tasks after the exec is shutdown.  Causes ScheduledThreadPoolExecutor (and NPE other places).
+			if ((!exec.isShutdown()) && (!exec.isTerminated())) {
+				tasks.add( exec.submit( task ) );
+			} else {
+				System.out.println("Exec shutdown in consumerDelegatedTasks");
+			}
 			// task.run();
 		}
 	}
